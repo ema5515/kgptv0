@@ -6,7 +6,7 @@ import { loadDocuments, loadWithInputFile } from "@/functions/loadDoc";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import "filepond/dist/filepond.min.css";
-import { Delete, File as FileIcon } from "lucide-react";
+import { Delete, File as FileIcon, Loader2 } from "lucide-react";
 import { FilePond, registerPlugin } from "react-filepond";
 import FilePondPluginFileEncode from "filepond-plugin-file-encode";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -17,13 +17,16 @@ export default function Home() {
   const [output, setOutput] = useState<any>();
   const [question, setQuestion] = useState<string>("");
   const [files, setFiles] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const response = () => {
+    setLoading(true);
     console.log("clicked");
     const filesUtf8 = filesToUtf8();
     console.log(files);
     const res = loadWithInputFile(filesUtf8, question);
     setOutput(res);
+    setLoading(false);
   };
 
   const filesToUtf8 = () => {
@@ -60,7 +63,9 @@ export default function Home() {
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Chiedi pure..."
         />
-        <Button onClick={response}>Start</Button>
+        <Button onClick={response} disabled={!files || files.length === 0}>
+          {loading ? <Loader2 className="animate-spin" /> : "Start"}
+        </Button>
         <Card className="m-auto w-full p-3">
           <p>{output || "> Risposta"}</p>
         </Card>
